@@ -53,7 +53,7 @@ test_loss = []  # INITIALIZING VARIABLES
 previous_accuracy = 0  # INITIALIZING VARIABLES
 previous_loss = 0  # INITIALIZING VARIABLES
 
-n_epochs = 30  # NUMBER OF TOTAL ITERATIONS
+n_epochs = 100  # NUMBER OF TOTAL ITERATIONS
 for epoch in range(n_epochs):  # RUNS FOR EVERY EPOCH
     batch_num = 0  # INITIALIZING VARIABLES
     cumulative_loss = 0  # INITIALIZING VARIABLES
