@@ -12,21 +12,23 @@ from timm.data import Mixup
 from torchvision.transforms import v2
 
 parser = argparse.ArgumentParser()  # DEFINING ARGUMENTS
+
 parser.add_argument('--arch', type=str,
                     choices=['resnet18', 'resnet20', 'resnet56'])  # GIVING CMD LINE CHOICES
 parser.add_argument('--process', type=str,
-                    choices=['resnet18', 'resnet20', 'resnet56'])  # GIVING CMD LINE CHOICES
+                    choices=['gpu', 'cpu'])  # GIVING CMD LINE CHOICES
+args = parser.parse_args()
 
-if parser.parse_args().arch == 'resnet18':  # IF OPTION SELECTED
+if args.arch == 'resnet18':  # IF OPTION SELECTED
     model = torch.hub.load('pytorch/vision:v0.10.0',
                            'resnet18', pretrained=True)  # LOAD RESNET18
     model.fc = nn.Linear(model.fc.in_features, 7)
-elif parser.parse_args().arch == 'resnet20':  # IF OPTION SELECTED
+elif args.arch == 'resnet20':  # IF OPTION SELECTED
     model = resnet20(num_classes=7)  # LOAD RESNET20
-elif parser.parse_args().arch == 'resnet56':  # IF OPTION SELECTED
+elif args.arch == 'resnet56':  # IF OPTION SELECTED
     model = resnet56(num_classes=7)  # LOAD RESNET56
 
-if parser.parse_args().arch == 'gpu':
+if args.process == 'gpu':
     device = torch.device('cuda')  # USES A GPU
 else:
     device = torch.device('cpu')  # USES CPU
