@@ -34,10 +34,16 @@ total_pixels = torch.stack([x for x, y in dataset_counter])  # COMBINES TENSORS 
 pixels_mean = torch.mean(total_pixels)  # MEAN VALUE FOR NORMALIZATION
 pixels_std = torch.std(total_pixels)  # STANDARD DEVIATION FOR NORMALIZATION
 
-transforms_train = Compose([Resize(256),  RandomCrop(224), ColorJitter(), RandomHorizontalFlip(),
-                            ToTensor(), Normalize(pixels_mean, pixels_std)])  # RANDOM TRANSFORMS TRAIN TO GENERALIZE
-transforms_test = Compose([Resize(256), CenterCrop(224), ToTensor(),
-                           Normalize(pixels_mean, pixels_std)])  # COMPOSED TRANSFORMS FOR NORMALIZATION
+if model == resnet20(num_classes=7):
+    transforms_train = Compose([Resize(256),  RandomCrop(224), ColorJitter(), RandomHorizontalFlip(),
+                                ToTensor(), Normalize(pixels_mean, pixels_std)])  # RANDOM TRANSFORMS TRAIN GENERALIZING
+    transforms_test = Compose([Resize(256), CenterCrop(224), ToTensor(),
+                            Normalize(pixels_mean, pixels_std)])  # COMPOSED TRANSFORMS FOR NORMALIZATION
+else:
+    transforms_train = Compose([Resize(256), RandomCrop(224), ColorJitter(), RandomHorizontalFlip(),
+                                ToTensor(), Normalize(pixels_mean, pixels_std)])  # RANDOM TRANSFORMS TRAIN GENERALIZING
+    transforms_test = Compose([RandomCrop(48, padding=4), ToTensor(),
+                               Normalize(pixels_mean, pixels_std)])  # COMPOSED TRANSFORMS FOR NORMALIZATION
 
 emotions_train = ImageFolder(root="./archive/train", transform=transforms_train)  # TRANSFORMS EVERY SAMPLE IN DATASET
 emotions_test = ImageFolder(root="./archive/test", transform=transforms_test)  # TRANSFORMS EVERY SAMPLE IN DATASET
