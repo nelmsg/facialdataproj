@@ -13,7 +13,7 @@ from torch.optim.lr_scheduler import StepLR
 device = torch.device('cpu')  # USES CPU
 
 parser = argparse.ArgumentParser()  # DEFINING ARGUMENTS
-parser.add_argument('arch', type=str,
+parser.add_argument('--arch', type=str,
                     choices=['resnet18', 'resnet20', 'resnet56'])  # GIVING CMD LINE CHOICES
 
 if parser.parse_args().arch == 'resnet18':  # IF OPTION SELECTED
