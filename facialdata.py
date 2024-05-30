@@ -7,6 +7,7 @@ from torchvision.transforms import (Normalize, Compose, ToTensor, RandomCrop, Ra
 import torch.optim as optim
 from pranc_models import resnet20, resnet56
 import argparse
+from torch.optim.lr_scheduler import StepLR
 
 # device = torch.device('cuda')  # USES A GPU
 device = torch.device('cpu')  # USES CPU
@@ -38,10 +39,11 @@ transforms_test = Compose([Resize(256), CenterCrop(224), ToTensor(),
 
 emotions_train = ImageFolder(root="./archive/train", transform=transforms_train)  # TRANSFORMS EVERY SAMPLE IN DATASET
 emotions_test = ImageFolder(root="./archive/test", transform=transforms_test)  # TRANSFORMS EVERY SAMPLE IN DATASET
-dataloader_train = DataLoader(emotions_train, batch_size=64, shuffle=True)  # MAKES A SHUFFLING DATALOADER FOR TRAINING
-dataloader_test = DataLoader(emotions_test, batch_size=64, shuffle=False)  # MAKES A DATALOADER FOR TESTING
+dataloader_train = DataLoader(emotions_train, batch_size=256, shuffle=True)  # MAKES A SHUFFLING DATALOADER FOR TRAINING
+dataloader_test = DataLoader(emotions_test, batch_size=256, shuffle=False)  # MAKES A DATALOADER FOR TESTING
 
-optimizer = optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)  # ESTABLISHES ADAM OPTIMIZER
+optimizer = optim.SGD(model.parameters(), lr=1e-1, weight_decay=1e-4)  # ESTABLISHES ADAM OPTIMIZER
+scheduler = StepLR(optimizer, step_size=30, gamma=0.1)
 loss_f = nn.CrossEntropyLoss()  # ESTABLISHES A LOSS FUNCTION BASED ON CEL
 
 test_acc = []  # INITIALIZING VARIABLES
@@ -106,3 +108,4 @@ for epoch in range(n_epochs):  # RUNS FOR EVERY EPOCH
           f"Test Accuracy: {acc_t} {accuracy_annotation}")  # EPOCH-WISE TOTAL REPORT
     previous_loss = cumulative_test_loss  # DEFINES PREVIOUS TESTING LOSS
     previous_accuracy = acc_t  # DEFINES PREVIOUS TESTING ACCURACY
+    scheduler.step()
