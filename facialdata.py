@@ -12,16 +12,18 @@ from torch.optim.lr_scheduler import StepLR
 # device = torch.device('cuda')  # USES A GPU
 device = torch.device('cpu')  # USES CPU
 
-parser = argparse.ArgumentParser()
-parser.add_argument('--sched-type', type=str, choices=['resnet18', 'resnet20', 'resnet56'])
+parser = argparse.ArgumentParser()  # DEFINING ARGUMENTS
+parser.add_argument('--sched-type', type=str,
+                    choices=['resnet18', 'resnet20', 'resnet56'])  # GIVING CMD LINE CHOICES
 
-if parser.parse_args().sched_type == 'resnet18':
-    model = torch.hub.load('pytorch/vision:v0.10.0', 'resnet18', pretrained=True)
+if parser.parse_args().sched_type == 'resnet18':  # IF OPTION SELECTED
+    model = torch.hub.load('pytorch/vision:v0.10.0',
+                           'resnet18', pretrained=True)  # LOAD RESNET18
     model.fc = nn.Linear(model.fc.in_features, 7)
-elif parser.parse_args().sched_type == 'resnet20':
-    model = resnet20(num_classes=7)
-elif parser.parse_args().sched_type == 'resnet56':
-    model = resnet56(num_classes=7)
+elif parser.parse_args().sched_type == 'resnet20':  # IF OPTION SELECTED
+    model = resnet20(num_classes=7)  # LOAD RESNET20
+elif parser.parse_args().sched_type == 'resnet56':  # IF OPTION SELECTED
+    model = resnet56(num_classes=7)  # LOAD RESNET56
 
 # model = torch.hub.load('pytorch/vision:v0.10.0', 'resnet18', pretrained=True)  # LOADS RESNET18
 # model.fc = nn.Linear(model.fc.in_features, 7)  # DEFINES THE EIGHT 'FEATURES' FOR EMOTION CATEGORIZATION
@@ -42,8 +44,8 @@ emotions_test = ImageFolder(root="./archive/test", transform=transforms_test)  #
 dataloader_train = DataLoader(emotions_train, batch_size=256, shuffle=True)  # MAKES A SHUFFLING DATALOADER FOR TRAINING
 dataloader_test = DataLoader(emotions_test, batch_size=256, shuffle=False)  # MAKES A DATALOADER FOR TESTING
 
-optimizer = optim.SGD(model.parameters(), lr=1e-1, weight_decay=1e-4)  # ESTABLISHES ADAM OPTIMIZER
-scheduler = StepLR(optimizer, step_size=30, gamma=0.1)
+optimizer = optim.SGD(model.parameters(), lr=1e-1, weight_decay=1e-4)  # ESTABLISHES SGD OPTIMIZER
+scheduler = StepLR(optimizer, step_size=30, gamma=0.1)  # ESTABLISHES LEARNING RATE DECAY
 loss_f = nn.CrossEntropyLoss()  # ESTABLISHES A LOSS FUNCTION BASED ON CEL
 
 test_acc = []  # INITIALIZING VARIABLES
@@ -56,20 +58,20 @@ for epoch in range(n_epochs):  # RUNS FOR EVERY EPOCH
     batch_num = 0  # INITIALIZING VARIABLES
     cumulative_loss = 0  # INITIALIZING VARIABLES
     cumulative_test_loss = 0  # INITIALIZING VARIABLES
-    total_data_train = 0
-    correct_data_train = 0
+    total_data_train = 0  # INITIALIZING VARIABLES
+    correct_data_train = 0  # INITIALIZING VARIABLES
     model.train()  # REMOVING DROPOUT
 
     for x, y in dataloader_train:  # RUNS FOR EVERY BATCH
         x = x.to(device)  # SENDS VARIABLE TO CPU OR GPU
         y = y.to(device)  # SENDS VARIABLE TO CPU OR GPU
 
-        total_data_train += len(y)
+        total_data_train += len(y)  # ADD BATCH TO TOTAL LENGTH
         Y_prediction = model(x)  # PUTS THE STACK THROUGH THE MODEL FOR THE PREDICTED VALUE
         loss = loss_f(Y_prediction, y)  # PULLS LOSS THROUGH THE CEL FUNCTION
         cumulative_loss += loss.detach().cpu()  # BUILDS TOTAL LOSS
         acc = torch.mean((Y_prediction.argmax(dim=1) == y).float())  # ACCURACY
-        correct_data_train += torch.sum((Y_prediction.argmax(dim=1) == y).float())
+        correct_data_train += torch.sum((Y_prediction.argmax(dim=1) == y).float())  # ADD
 
         optimizer.zero_grad()
         loss.backward()
