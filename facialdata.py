@@ -83,7 +83,7 @@ for epoch in range(n_epochs):  # RUNS FOR EVERY EPOCH
         loss_annotation = "\033[1;31;40m [Negative Change.] \033[1;37;40m"
     else:
         loss_annotation = "\033[1;32;40m [Improvement!] \033[1;37;40m"
-    print(f"Epoch: {epoch}  Total Test Loss: {cumulative_test_loss} {loss_annotation}  "
+    print(f"\033[1;37;40m Epoch: {epoch}  Total Test Loss: {cumulative_test_loss} {loss_annotation}  "
           f"Test Accuracy: {acc_t} {accuracy_annotation}")  # EPOCH-WISE TOTAL REPORT
     previous_loss = cumulative_test_loss  # DEFINES PREVIOUS TESTING LOSS
     previous_accuracy = acc_t  # DEFINES PREVIOUS TESTING ACCURACY
