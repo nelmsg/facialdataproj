@@ -41,16 +41,20 @@ for epoch in range(n_epochs):  # RUNS FOR EVERY EPOCH
     batch_num = 0  # INITIALIZING VARIABLES
     cumulative_loss = 0  # INITIALIZING VARIABLES
     cumulative_test_loss = 0  # INITIALIZING VARIABLES
+    total_data_train = 0
+    correct_data_train = 0
     model.train()  # REMOVING DROPOUT
 
     for x, y in dataloader_train:  # RUNS FOR EVERY BATCH
         x = x.to(device)  # SENDS VARIABLE TO CPU OR GPU
         y = y.to(device)  # SENDS VARIABLE TO CPU OR GPU
 
+        total_data_train += len(y)
         Y_prediction = model(x)  # PUTS THE STACK THROUGH THE MODEL FOR THE PREDICTED VALUE
         loss = loss_f(Y_prediction, y)  # PULLS LOSS THROUGH THE CEL FUNCTION
         cumulative_loss += loss.detach().cpu()  # BUILDS TOTAL LOSS
         acc = torch.mean((Y_prediction.argmax(dim=1) == y).float())  # ACCURACY
+        correct_data_train += torch.sum((Y_prediction.argmax(dim=1) == y).float())
 
         optimizer.zero_grad()
         loss.backward()
@@ -58,7 +62,8 @@ for epoch in range(n_epochs):  # RUNS FOR EVERY EPOCH
         batch_num += 1  # COUNTING
 
         print(f"    Epoch: {epoch}  Batch: {batch_num}  Accuracy: {acc}  BS: {len(y)}")  # BATCH-WISE REPORT
-    print(f"Cumulative Loss: {cumulative_loss}")  # EPOCH-WISE LOSS REPORT
+    cumulative_train_accuracy = correct_data_train / total_data_train
+    print(f"Cumulative Loss: {cumulative_loss}   Cumulative Training Accuracy: {cumulative_train_accuracy}")  # EPOCH-WISE TRAINING REPORT
 
     with torch.no_grad():
         model.eval()  # REMOVES DROPOUT
