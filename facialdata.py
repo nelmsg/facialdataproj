@@ -60,7 +60,7 @@ optimizer = optim.SGD(model.parameters(), lr=1e-1, weight_decay=1e-4)  # ESTABLI
 scheduler = StepLR(optimizer, step_size=30, gamma=0.1)  # ESTABLISHES LEARNING RATE DECAY
 loss_f = nn.CrossEntropyLoss()  # ESTABLISHES A LOSS FUNCTION BASED ON CEL
 
-mixup_args = {'mixup_alpha': 0.2, 'cutmix_alpha': 1.0, 'cutmix_minmax': None,
+mixup_args = {'mixup_alpha': 0.8, 'cutmix_alpha': 1.0, 'cutmix_minmax': None,
               'prob': 0.5, 'switch_prob': 0.5, 'mode': 'batch', 'label_smoothing': 0.1,
               'num_classes': 7}
 
