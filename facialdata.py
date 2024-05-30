@@ -9,7 +9,6 @@ from pranc_models import resnet20, resnet56
 import argparse
 from torch.optim.lr_scheduler import StepLR
 from timm.data import Mixup
-from torchvision.transforms import v2
 
 parser = argparse.ArgumentParser()  # DEFINING ARGUMENTS
 
