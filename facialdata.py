@@ -9,8 +9,10 @@ import torch.optim as optim
 # device = torch.device('cuda')  # USES A GPU
 device = torch.device('cpu')  # USES CPU
 
-model = torch.hub.load('pytorch/vision:v0.10.0', 'resnet18', pretrained=True)  # LOADS RESNET18 MODEL
-model.fc = nn.Linear(model.fc.in_features, 7)  # DEFINES THE EIGHT 'FEATURES' FOR EMOTION CATEGORIZATION
+model = resnet20(num_classes=7)
+
+# model = torch.hub.load('pytorch/vision:v0.10.0', 'resnet18', pretrained=True)  # LOADS RESNET18 MODEL
+# model.fc = nn.Linear(model.fc.in_features, 7)  # DEFINES THE EIGHT 'FEATURES' FOR EMOTION CATEGORIZATION
 model = model.to(device)  # SENDS THE MODEL TO CPU OR GPU
 
 dataset_counter = ImageFolder(root="./archive/train", transform=ToTensor())  # MINI TRANSFORMS FOR COUNTING
