@@ -54,7 +54,7 @@ else:
 
 emotions_train = ImageFolder(root="./archive/train", transform=transforms_train)  # TRANSFORMS EVERY SAMPLE IN DATASET
 emotions_test = ImageFolder(root="./archive/test", transform=transforms_test)  # TRANSFORMS EVERY SAMPLE IN DATASET
-dataloader_train = DataLoader(emotions_train, batch_size=256, shuffle=True)  # MAKES A SHUFFLING DATALOADER FOR TRAINING
+dataloader_train = DataLoader(emotions_train, batch_size=256, shuffle=True, drop_last=True)  # MAKES A SHUFFLING DATALOADER FOR TRAINING
 dataloader_test = DataLoader(emotions_test, batch_size=256, shuffle=False)  # MAKES A DATALOADER FOR TESTING
 
 optimizer = optim.SGD(model.parameters(), lr=1e-1, weight_decay=1e-4)  # ESTABLISHES SGD OPTIMIZER
