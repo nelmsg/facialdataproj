@@ -5,14 +5,24 @@ from torch.utils.data import DataLoader
 from torchvision.transforms import (Normalize, Compose, ToTensor, RandomCrop, RandomHorizontalFlip,
                                     ColorJitter, Resize, CenterCrop)
 import torch.optim as optim
-from pranc_models import resnet20
+from pranc_models import resnet20, resnet56
+import argparse
 
 # device = torch.device('cuda')  # USES A GPU
 device = torch.device('cpu')  # USES CPU
 
-model = resnet20(num_classes=7)
+parser = argparse.ArgumentParser()
+parser.add_argument('--sched-type', type=str, choices=['resnet18', 'resnet20', 'resnet56'])
 
-# model = torch.hub.load('pytorch/vision:v0.10.0', 'resnet18', pretrained=True)  # LOADS RESNET18 MODEL
+if parser.parse_args().sched_type == 'resnet18':
+    model = torch.hub.load('pytorch/vision:v0.10.0', 'resnet18', pretrained=True)
+    model.fc = nn.Linear(model.fc.in_features, 7)
+elif parser.parse_args().sched_type == 'resnet20':
+    model = resnet20(num_classes=7)
+elif parser.parse_args().sched_type == 'resnet56':
+    model = resnet56(num_classes=7)
+
+# model = torch.hub.load('pytorch/vision:v0.10.0', 'resnet18', pretrained=True)  # LOADS RESNET18
 # model.fc = nn.Linear(model.fc.in_features, 7)  # DEFINES THE EIGHT 'FEATURES' FOR EMOTION CATEGORIZATION
 model = model.to(device)  # SENDS THE MODEL TO CPU OR GPU
 
