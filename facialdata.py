@@ -5,12 +5,15 @@ from torch.utils.data import DataLoader
 from torchvision.transforms import (Normalize, Compose, ToTensor, RandomCrop, RandomHorizontalFlip,
                                     ColorJitter, Resize, CenterCrop)
 import torch.optim as optim
+from pranc_models import resnet20
 
 # device = torch.device('cuda')  # USES A GPU
 device = torch.device('cpu')  # USES CPU
 
-model = torch.hub.load('pytorch/vision:v0.10.0', 'resnet18', pretrained=True)  # LOADS RESNET18 MODEL
-model.fc = nn.Linear(model.fc.in_features, 7)  # DEFINES THE EIGHT 'FEATURES' FOR EMOTION CATEGORIZATION
+model = resnet20(num_classes=7)
+
+# model = torch.hub.load('pytorch/vision:v0.10.0', 'resnet18', pretrained=True)  # LOADS RESNET18 MODEL
+# model.fc = nn.Linear(model.fc.in_features, 7)  # DEFINES THE EIGHT 'FEATURES' FOR EMOTION CATEGORIZATION
 model = model.to(device)  # SENDS THE MODEL TO CPU OR GPU
 
 dataset_counter = ImageFolder(root="./archive/train", transform=ToTensor())  # MINI TRANSFORMS FOR COUNTING
@@ -41,16 +44,20 @@ for epoch in range(n_epochs):  # RUNS FOR EVERY EPOCH
     batch_num = 0  # INITIALIZING VARIABLES
     cumulative_loss = 0  # INITIALIZING VARIABLES
     cumulative_test_loss = 0  # INITIALIZING VARIABLES
+    total_data_train = 0
+    correct_data_train = 0
     model.train()  # REMOVING DROPOUT
 
     for x, y in dataloader_train:  # RUNS FOR EVERY BATCH
         x = x.to(device)  # SENDS VARIABLE TO CPU OR GPU
         y = y.to(device)  # SENDS VARIABLE TO CPU OR GPU
 
+        total_data_train += len(y)
         Y_prediction = model(x)  # PUTS THE STACK THROUGH THE MODEL FOR THE PREDICTED VALUE
         loss = loss_f(Y_prediction, y)  # PULLS LOSS THROUGH THE CEL FUNCTION
         cumulative_loss += loss.detach().cpu()  # BUILDS TOTAL LOSS
         acc = torch.mean((Y_prediction.argmax(dim=1) == y).float())  # ACCURACY
+        correct_data_train += torch.sum((Y_prediction.argmax(dim=1) == y).float())
 
         optimizer.zero_grad()
         loss.backward()
@@ -58,7 +65,9 @@ for epoch in range(n_epochs):  # RUNS FOR EVERY EPOCH
         batch_num += 1  # COUNTING
 
         print(f"    Epoch: {epoch}  Batch: {batch_num}  Accuracy: {acc}  BS: {len(y)}")  # BATCH-WISE REPORT
-    print(f"Cumulative Loss: {cumulative_loss}")  # EPOCH-WISE LOSS REPORT
+    cumulative_train_accuracy = correct_data_train / total_data_train
+    print(f"Cumulative Loss: {cumulative_loss}   "
+          f"Cumulative Training Accuracy: {cumulative_train_accuracy}")  # EPOCH-WISE TRAINING REPORT
 
     with torch.no_grad():
         model.eval()  # REMOVES DROPOUT
@@ -83,7 +92,7 @@ for epoch in range(n_epochs):  # RUNS FOR EVERY EPOCH
         loss_annotation = "\033[1;31;40m [Negative Change.] \033[1;37;40m"
     else:
         loss_annotation = "\033[1;32;40m [Improvement!] \033[1;37;40m"
-    print(f"Epoch: {epoch}  Total Test Loss: {cumulative_test_loss} {loss_annotation}  "
+    print(f"\033[1;37;40m Epoch: {epoch}  Total Test Loss: {cumulative_test_loss} {loss_annotation}  "
           f"Test Accuracy: {acc_t} {accuracy_annotation}")  # EPOCH-WISE TOTAL REPORT
     previous_loss = cumulative_test_loss  # DEFINES PREVIOUS TESTING LOSS
     previous_accuracy = acc_t  # DEFINES PREVIOUS TESTING ACCURACY
