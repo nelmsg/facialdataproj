@@ -38,11 +38,11 @@ if model == resnet20(num_classes=7):
     transforms_train = Compose([Resize(256),  RandomCrop(224), ColorJitter(), RandomHorizontalFlip(),
                                 ToTensor(), Normalize(pixels_mean, pixels_std)])  # RANDOM TRANSFORMS TRAIN GENERALIZING
     transforms_test = Compose([Resize(256), CenterCrop(224), ToTensor(),
-                            Normalize(pixels_mean, pixels_std)])  # COMPOSED TRANSFORMS FOR NORMALIZATION
+                               Normalize(pixels_mean, pixels_std)])  # COMPOSED TRANSFORMS FOR NORMALIZATION
 else:
-    transforms_train = Compose([Resize(256), RandomCrop(224), ColorJitter(), RandomHorizontalFlip(),
+    transforms_train = Compose([RandomCrop(48, padding=4), ColorJitter(), RandomHorizontalFlip(),
                                 ToTensor(), Normalize(pixels_mean, pixels_std)])  # RANDOM TRANSFORMS TRAIN GENERALIZING
-    transforms_test = Compose([RandomCrop(48, padding=4), ToTensor(),
+    transforms_test = Compose([ToTensor(),
                                Normalize(pixels_mean, pixels_std)])  # COMPOSED TRANSFORMS FOR NORMALIZATION
 
 emotions_train = ImageFolder(root="./archive/train", transform=transforms_train)  # TRANSFORMS EVERY SAMPLE IN DATASET
