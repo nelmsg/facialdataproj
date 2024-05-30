@@ -13,16 +13,16 @@ from torch.optim.lr_scheduler import StepLR
 device = torch.device('cpu')  # USES CPU
 
 parser = argparse.ArgumentParser()  # DEFINING ARGUMENTS
-parser.add_argument('--sched-type', type=str,
+parser.add_argument('arch', type=str,
                     choices=['resnet18', 'resnet20', 'resnet56'])  # GIVING CMD LINE CHOICES
 
-if parser.parse_args().sched_type == 'resnet18':  # IF OPTION SELECTED
+if parser.parse_args().arch == 'resnet18':  # IF OPTION SELECTED
     model = torch.hub.load('pytorch/vision:v0.10.0',
                            'resnet18', pretrained=True)  # LOAD RESNET18
     model.fc = nn.Linear(model.fc.in_features, 7)
-elif parser.parse_args().sched_type == 'resnet20':  # IF OPTION SELECTED
+elif parser.parse_args().arch == 'resnet20':  # IF OPTION SELECTED
     model = resnet20(num_classes=7)  # LOAD RESNET20
-elif parser.parse_args().sched_type == 'resnet56':  # IF OPTION SELECTED
+elif parser.parse_args().arch == 'resnet56':  # IF OPTION SELECTED
     model = resnet56(num_classes=7)  # LOAD RESNET56
 
 # model = torch.hub.load('pytorch/vision:v0.10.0', 'resnet18', pretrained=True)  # LOADS RESNET18
