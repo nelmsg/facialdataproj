@@ -8,12 +8,13 @@ import torch.optim as optim
 from pranc_models import resnet20, resnet56
 import argparse
 from torch.optim.lr_scheduler import StepLR
-
-# device = torch.device('cuda')  # USES A GPU
-device = torch.device('cpu')  # USES CPU
+from timm.data import Mixup
+from torchvision.transforms import v2
 
 parser = argparse.ArgumentParser()  # DEFINING ARGUMENTS
 parser.add_argument('--arch', type=str,
+                    choices=['resnet18', 'resnet20', 'resnet56'])  # GIVING CMD LINE CHOICES
+parser.add_argument('--process', type=str,
                     choices=['resnet18', 'resnet20', 'resnet56'])  # GIVING CMD LINE CHOICES
 
 if parser.parse_args().arch == 'resnet18':  # IF OPTION SELECTED
@@ -24,6 +25,11 @@ elif parser.parse_args().arch == 'resnet20':  # IF OPTION SELECTED
     model = resnet20(num_classes=7)  # LOAD RESNET20
 elif parser.parse_args().arch == 'resnet56':  # IF OPTION SELECTED
     model = resnet56(num_classes=7)  # LOAD RESNET56
+
+if parser.parse_args().arch == 'gpu':
+    device = torch.device('cuda')  # USES A GPU
+else:
+    device = torch.device('cpu')  # USES CPU
 
 # model = torch.hub.load('pytorch/vision:v0.10.0', 'resnet18', pretrained=True)  # LOADS RESNET18
 # model.fc = nn.Linear(model.fc.in_features, 7)  # DEFINES THE EIGHT 'FEATURES' FOR EMOTION CATEGORIZATION
@@ -54,6 +60,12 @@ optimizer = optim.SGD(model.parameters(), lr=1e-1, weight_decay=1e-4)  # ESTABLI
 scheduler = StepLR(optimizer, step_size=30, gamma=0.1)  # ESTABLISHES LEARNING RATE DECAY
 loss_f = nn.CrossEntropyLoss()  # ESTABLISHES A LOSS FUNCTION BASED ON CEL
 
+mixup_args = {'mixup_alpha': 0.2, 'cutmix_alpha': 1.0, 'cutmix_minmax': None,
+              'prob': 0.5, 'switch_prob': 0.5, 'mode': 'batch', 'label_smoothing': 0.1,
+              'num_classes': 7}
+
+cutmix = Mixup(**mixup_args)
+
 test_acc = []  # INITIALIZING VARIABLES
 test_loss = []  # INITIALIZING VARIABLES
 previous_accuracy = 0  # INITIALIZING VARIABLES
@@ -71,13 +83,15 @@ for epoch in range(n_epochs):  # RUNS FOR EVERY EPOCH
     for x, y in dataloader_train:  # RUNS FOR EVERY BATCH
         x = x.to(device)  # SENDS VARIABLE TO CPU OR GPU
         y = y.to(device)  # SENDS VARIABLE TO CPU OR GPU
+        y_for_acc = y
+        x, y = cutmix(x, y)
 
         total_data_train += len(y)  # ADD BATCH TO TOTAL LENGTH
         Y_prediction = model(x)  # PUTS THE STACK THROUGH THE MODEL FOR THE PREDICTED VALUE
         loss = loss_f(Y_prediction, y)  # PULLS LOSS THROUGH THE CEL FUNCTION
         cumulative_loss += loss.detach().cpu()  # BUILDS TOTAL LOSS
-        acc = torch.mean((Y_prediction.argmax(dim=1) == y).float())  # ACCURACY
-        correct_data_train += torch.sum((Y_prediction.argmax(dim=1) == y).float())  # ADD
+        acc = torch.mean((Y_prediction.argmax(dim=1) == y_for_acc).float())  # ACCURACY
+        correct_data_train += torch.sum((Y_prediction.argmax(dim=1) == y_for_acc).float())  # ADD
 
         optimizer.zero_grad()
         loss.backward()
@@ -116,4 +130,5 @@ for epoch in range(n_epochs):  # RUNS FOR EVERY EPOCH
           f"Test Accuracy: {acc_t} {accuracy_annotation}")  # EPOCH-WISE TOTAL REPORT
     previous_loss = cumulative_test_loss  # DEFINES PREVIOUS TESTING LOSS
     previous_accuracy = acc_t  # DEFINES PREVIOUS TESTING ACCURACY
+
     scheduler.step()
