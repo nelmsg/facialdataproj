@@ -13,7 +13,7 @@ from timm.data import Mixup
 parser = argparse.ArgumentParser()  # DEFINING ARGUMENT FUNCTION
 
 parser.add_argument('--arch', type=str,
-                    choices=['resnet18', 'resnet20', 'resnet56'])  # GIVING CMD LINE CHOICES
+                    choices=['resnet18', 'resnet20', 'resnet50', 'resnet56'])  # GIVING CMD LINE CHOICES
 parser.add_argument('--process', type=str,
                     choices=['gpu', 'cpu'])  # GIVING CMD LINE CHOICES
 parser.add_argument('--epochs', type=int)  # GIVING CMD LINE INPUT
@@ -64,7 +64,7 @@ else:
 
 emotions_train = ImageFolder(root="./archive/train", transform=transforms_train)  # TRANSFORMS EVERY SAMPLE IN DATASET
 emotions_test = ImageFolder(root="./archive/test", transform=transforms_test)  # TRANSFORMS EVERY SAMPLE IN DATASET
-dataloader_train = DataLoader(emotions_train, batch_size=256, shuffle=True, drop_last=True)  # MAKES A SHUFFLING DATALOADER FOR TRAINING
+dataloader_train = DataLoader(emotions_train, batch_size=256, shuffle=True, drop_last=True)  # SHUFFLE LOADER TO TRAIN
 dataloader_test = DataLoader(emotions_test, batch_size=256, shuffle=False)  # MAKES A DATALOADER FOR TESTING
 
 optimizer = optim.SGD(model.parameters(), lr=1e-1, weight_decay=1e-4)  # ESTABLISHES SGD OPTIMIZER
@@ -73,8 +73,8 @@ loss_f = nn.CrossEntropyLoss()  # ESTABLISHES A LOSS FUNCTION BASED ON CEL
 
 mixup_args = {'mixup_alpha': 0.8, 'cutmix_alpha': 1.0, 'cutmix_minmax': None,
               'prob': 0.5, 'switch_prob': 0.5, 'mode': 'batch', 'label_smoothing': 0.1,
-              'num_classes': 7}
-cutmix = Mixup(**mixup_args)
+              'num_classes': 7}  # DEFINING MIXUP AND CUTMIX PARAMETERS
+cutmix = Mixup(**mixup_args)  # APPLYING
 
 test_acc = []  # INITIALIZING VARIABLES
 test_loss = []  # INITIALIZING VARIABLES
