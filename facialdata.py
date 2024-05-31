@@ -66,7 +66,7 @@ emotions_test = ImageFolder(root="./archive/test", transform=transforms_test)  #
 dataloader_train = DataLoader(emotions_train, batch_size=256, shuffle=True, drop_last=True, num_workers=4, pin_memory=True)  # SHUFFLE LOADER TO TRAIN
 dataloader_test = DataLoader(emotions_test, batch_size=256, shuffle=False, num_workers=4, pin_memory=True)  # MAKES A DATALOADER FOR TESTING
 
-optimizer = optim.SGD(model.parameters(), lr=1e-1, weight_decay=1e-4)  # ESTABLISHES SGD OPTIMIZER
+optimizer = optim.SGD(model.parameters(), lr=1e-1, weight_decay=1e-4, momentum=0.9)  # ESTABLISHES SGD OPTIMIZER
 scheduler = StepLR(optimizer, step_size=30, gamma=0.1)  # ESTABLISHES LEARNING RATE DECAY
 loss_f = nn.CrossEntropyLoss()  # ESTABLISHES A LOSS FUNCTION BASED ON CEL
 
