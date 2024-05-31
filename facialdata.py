@@ -17,6 +17,8 @@ parser.add_argument('--arch', type=str,
 parser.add_argument('--process', type=str,
                     choices=['gpu', 'cpu'])  # GIVING CMD LINE CHOICES
 parser.add_argument('--epochs', type=int)  # GIVING CMD LINE INPUT
+parser.add_argument('--mixup', type=str,
+                    choices=['on', 'off'])  # GIVING CMD LINE CHOICES
 args = parser.parse_args()  # DEFINING TOTAL ARGUMENTS
 
 if args.arch == 'resnet18':  # IF OPTION SELECTED
@@ -48,14 +50,14 @@ total_pixels = torch.stack([x for x, y in dataset_counter])  # COMBINES TENSORS 
 pixels_mean = torch.mean(total_pixels)  # MEAN VALUE FOR NORMALIZATION
 pixels_std = torch.std(total_pixels)  # STANDARD DEVIATION FOR NORMALIZATION
 
-if model == resnet20(num_classes=7):
-    transforms_train = Compose([Resize(256),  RandomCrop(224), ColorJitter(), RandomHorizontalFlip(),
+if args.arch == 'resnet18' or 'resnet50':
+    transforms_train = Compose([Resize(256),  RandomCrop(224), ColorJitter(), RandomHorizontalFlip(), RandomRotation(20),
                                 ToTensor(), Normalize(pixels_mean, pixels_std)])  # RANDOM TRANSFORMS TRAIN GENERALIZING
     transforms_test = Compose([Resize(256), CenterCrop(224), ToTensor(),
                                Normalize(pixels_mean, pixels_std)])  # COMPOSED TRANSFORMS FOR NORMALIZATION
 else:
     transforms_train = Compose([RandomCrop(48, padding=4), ColorJitter(), RandomHorizontalFlip(),
-                                RandomRotation(90),
+                                RandomRotation(20),
                                 ToTensor(), Normalize(pixels_mean, pixels_std)])  # RANDOM TRANSFORMS TRAIN GENERALIZING
     transforms_test = Compose([ToTensor(),
                                Normalize(pixels_mean, pixels_std)])  # COMPOSED TRANSFORMS FOR NORMALIZATION
@@ -72,7 +74,6 @@ loss_f = nn.CrossEntropyLoss()  # ESTABLISHES A LOSS FUNCTION BASED ON CEL
 mixup_args = {'mixup_alpha': 0.8, 'cutmix_alpha': 1.0, 'cutmix_minmax': None,
               'prob': 0.5, 'switch_prob': 0.5, 'mode': 'batch', 'label_smoothing': 0.1,
               'num_classes': 7}
-
 cutmix = Mixup(**mixup_args)
 
 test_acc = []  # INITIALIZING VARIABLES
@@ -92,7 +93,8 @@ for epoch in range(n_epochs):  # RUNS FOR EVERY EPOCH
         x = x.to(device)  # SENDS VARIABLE TO CPU OR GPU
         y = y.to(device)  # SENDS VARIABLE TO CPU OR GPU
         y_for_acc = y
-        x, y = cutmix(x, y)
+        if args.mixup == 'on':
+            x, y = cutmix(x, y)
 
         total_data_train += len(y)  # ADD BATCH TO TOTAL LENGTH
         Y_prediction = model(x)  # PUTS THE STACK THROUGH THE MODEL FOR THE PREDICTED VALUE
