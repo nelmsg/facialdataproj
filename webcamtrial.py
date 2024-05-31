@@ -27,7 +27,7 @@ while retention:
     retention, frame = cap.read()
     x = model(frame_tensor)
     key = cv2.waitKey(100)
-    print(x, x.argmax(dim=1))
+    print(x.argmax(dim=1).item())
     if key == 27:  # IF ESC KEY PRESSED
         break  # END RETENTION
 
