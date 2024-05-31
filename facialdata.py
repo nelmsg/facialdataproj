@@ -108,7 +108,7 @@ for epoch in range(n_epochs):  # RUNS FOR EVERY EPOCH
         batch_num += 1  # COUNTING
 
         print(f"    Epoch: {epoch}  Batch: {batch_num}  Accuracy: {acc}"
-              f"BS: {len(y)}  Model: {args.arch}")  # BATCH-WISE REPORT
+              f" BS: {len(y)}  Model: {args.arch}")  # BATCH-WISE REPORT
     cumulative_train_accuracy = correct_data_train / total_data_train
     print(f"Cumulative Loss: {cumulative_loss}   "
           f"Cumulative Training Accuracy: {cumulative_train_accuracy}")  # EPOCH-WISE TRAINING REPORT
