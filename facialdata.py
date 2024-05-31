@@ -11,7 +11,6 @@ from torch.optim.lr_scheduler import StepLR
 from timm.data import Mixup
 
 parser = argparse.ArgumentParser()  # DEFINING ARGUMENT FUNCTION
-
 parser.add_argument('--arch', type=str,
                     choices=['resnet18', 'resnet20', 'resnet50', 'resnet56'])  # GIVING CMD LINE CHOICES
 parser.add_argument('--process', type=str,
@@ -80,6 +79,7 @@ test_acc = []  # INITIALIZING VARIABLES
 test_loss = []  # INITIALIZING VARIABLES
 previous_accuracy = 0  # INITIALIZING VARIABLES
 previous_loss = 0  # INITIALIZING VARIABLES
+print("\033[1;37;40m")  # INITIALIZING COLOR
 
 for epoch in range(n_epochs):  # RUNS FOR EVERY EPOCH
     batch_num = 0  # INITIALIZING VARIABLES
@@ -108,7 +108,8 @@ for epoch in range(n_epochs):  # RUNS FOR EVERY EPOCH
         optimizer.step()  # PROGRESS
         batch_num += 1  # COUNTING
 
-        print(f"    Epoch: {epoch}  Batch: {batch_num}  Accuracy: {acc}  BS: {len(y)}")  # BATCH-WISE REPORT
+        print(f"    Epoch: {epoch}  Batch: {batch_num}  Accuracy: {acc}"
+              f"BS: {len(y)}  Model: {args.arch}")  # BATCH-WISE REPORT
     cumulative_train_accuracy = correct_data_train / total_data_train
     print(f"Cumulative Loss: {cumulative_loss}   "
           f"Cumulative Training Accuracy: {cumulative_train_accuracy}")  # EPOCH-WISE TRAINING REPORT
@@ -142,3 +143,5 @@ for epoch in range(n_epochs):  # RUNS FOR EVERY EPOCH
     previous_accuracy = acc_t  # DEFINES PREVIOUS TESTING ACCURACY
 
     scheduler.step()
+
+torch.save(model.state_dict(), f"{args.arch}_model_file_mixup_{args.mixup}.pth")
