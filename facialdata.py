@@ -63,8 +63,8 @@ else:
 
 emotions_train = ImageFolder(root="./archive/train", transform=transforms_train)  # TRANSFORMS EVERY SAMPLE IN DATASET
 emotions_test = ImageFolder(root="./archive/test", transform=transforms_test)  # TRANSFORMS EVERY SAMPLE IN DATASET
-dataloader_train = DataLoader(emotions_train, batch_size=256, shuffle=True, drop_last=True, num_workers=4, pin_memory=True)  # SHUFFLE LOADER TO TRAIN
-dataloader_test = DataLoader(emotions_test, batch_size=256, shuffle=False, num_workers=4, pin_memory=True)  # MAKES A DATALOADER FOR TESTING
+dataloader_train = DataLoader(emotions_train, batch_size=256, shuffle=True, drop_last=True, num_workers=0, pin_memory=True)  # SHUFFLE LOADER TO TRAIN
+dataloader_test = DataLoader(emotions_test, batch_size=256, shuffle=False, num_workers=0, pin_memory=True)  # MAKES A DATALOADER FOR TESTING
 
 optimizer = optim.SGD(model.parameters(), lr=1e-1, weight_decay=1e-4, momentum=0.9)  # ESTABLISHES SGD OPTIMIZER
 scheduler = StepLR(optimizer, step_size=30, gamma=0.1)  # ESTABLISHES LEARNING RATE DECAY
@@ -79,7 +79,6 @@ test_acc = []  # INITIALIZING VARIABLES
 test_loss = []  # INITIALIZING VARIABLES
 previous_accuracy = 0  # INITIALIZING VARIABLES
 previous_loss = 0  # INITIALIZING VARIABLES
-print("\033[1;37;40m")  # INITIALIZING COLOR
 
 for epoch in range(n_epochs):  # RUNS FOR EVERY EPOCH
     batch_num = 0  # INITIALIZING VARIABLES
@@ -87,7 +86,7 @@ for epoch in range(n_epochs):  # RUNS FOR EVERY EPOCH
     cumulative_test_loss = 0  # INITIALIZING VARIABLES
     total_data_train = 0  # INITIALIZING VARIABLES
     correct_data_train = 0  # INITIALIZING VARIABLES
-    model.train()  # REMOVING DROPOUT
+    model.train()  # ADDING DROPOUT
 
     for x, y in dataloader_train:  # RUNS FOR EVERY BATCH
         x = x.to(device)  # SENDS VARIABLE TO CPU OR GPU
