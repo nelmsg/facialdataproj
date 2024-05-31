@@ -9,7 +9,6 @@ from pranc_models import resnet20, resnet56
 import argparse
 from torch.optim.lr_scheduler import StepLR
 from timm.data import Mixup
-from os import system
 
 parser = argparse.ArgumentParser()  # DEFINING ARGUMENT FUNCTION
 
@@ -45,8 +44,6 @@ n_epochs = args.epochs
 # model = torch.hub.load('pytorch/vision:v0.10.0', 'resnet18', pretrained=True)  # LOADS RESNET18
 # model.fc = nn.Linear(model.fc.in_features, 7)  # DEFINES THE EIGHT 'FEATURES' FOR EMOTION CATEGORIZATION
 model = model.to(device)  # SENDS THE MODEL TO CPU OR GPU
-
-system('cls')
 
 dataset_counter = ImageFolder(root="./archive/train", transform=ToTensor())  # MINI TRANSFORMS FOR COUNTING
 total_pixels = torch.stack([x for x, y in dataset_counter])  # COMBINES TENSORS INTO ONE STACK
