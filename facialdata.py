@@ -3,25 +3,30 @@ import torch.nn as nn
 from torchvision.datasets import ImageFolder
 from torch.utils.data import DataLoader
 from torchvision.transforms import (Normalize, Compose, ToTensor, RandomCrop, RandomHorizontalFlip,
-                                    ColorJitter, Resize, CenterCrop)
+                                    ColorJitter, Resize, CenterCrop, RandomRotation)
 import torch.optim as optim
 from pranc_models import resnet20, resnet56
 import argparse
 from torch.optim.lr_scheduler import StepLR
 from timm.data import Mixup
 
-parser = argparse.ArgumentParser()  # DEFINING ARGUMENTS
+parser = argparse.ArgumentParser()  # DEFINING ARGUMENT FUNCTION
 
 parser.add_argument('--arch', type=str,
                     choices=['resnet18', 'resnet20', 'resnet56'])  # GIVING CMD LINE CHOICES
 parser.add_argument('--process', type=str,
                     choices=['gpu', 'cpu'])  # GIVING CMD LINE CHOICES
-args = parser.parse_args()
+parser.add_argument('--epochs', type=int)  # GIVING CMD LINE INPUT
+args = parser.parse_args()  # DEFINING TOTAL ARGUMENTS
 
 if args.arch == 'resnet18':  # IF OPTION SELECTED
     model = torch.hub.load('pytorch/vision:v0.10.0',
                            'resnet18', pretrained=True)  # LOAD RESNET18
-    model.fc = nn.Linear(model.fc.in_features, 7)
+    model.fc = nn.Linear(model.fc.in_features, 7)  # DEFINE NUMBER OF CLASSES
+if args.arch == 'resnet50':  # IF OPTION SELECTED
+    model = torch.hub.load('pytorch/vision:v0.10.0',
+                           'resnet50', pretrained=True)  # LOAD RESNET18
+    model.fc = nn.Linear(model.fc.in_features, 7)  # DEFINE NUMBER OF CLASSES
 elif args.arch == 'resnet20':  # IF OPTION SELECTED
     model = resnet20(num_classes=7)  # LOAD RESNET20
 elif args.arch == 'resnet56':  # IF OPTION SELECTED
@@ -31,6 +36,8 @@ if args.process == 'gpu':
     device = torch.device('cuda')  # USES A GPU
 else:
     device = torch.device('cpu')  # USES CPU
+
+n_epochs = args.epochs
 
 # model = torch.hub.load('pytorch/vision:v0.10.0', 'resnet18', pretrained=True)  # LOADS RESNET18
 # model.fc = nn.Linear(model.fc.in_features, 7)  # DEFINES THE EIGHT 'FEATURES' FOR EMOTION CATEGORIZATION
@@ -48,6 +55,7 @@ if model == resnet20(num_classes=7):
                                Normalize(pixels_mean, pixels_std)])  # COMPOSED TRANSFORMS FOR NORMALIZATION
 else:
     transforms_train = Compose([RandomCrop(48, padding=4), ColorJitter(), RandomHorizontalFlip(),
+                                RandomRotation(90),
                                 ToTensor(), Normalize(pixels_mean, pixels_std)])  # RANDOM TRANSFORMS TRAIN GENERALIZING
     transforms_test = Compose([ToTensor(),
                                Normalize(pixels_mean, pixels_std)])  # COMPOSED TRANSFORMS FOR NORMALIZATION
@@ -72,7 +80,6 @@ test_loss = []  # INITIALIZING VARIABLES
 previous_accuracy = 0  # INITIALIZING VARIABLES
 previous_loss = 0  # INITIALIZING VARIABLES
 
-n_epochs = 100  # NUMBER OF TOTAL ITERATIONS
 for epoch in range(n_epochs):  # RUNS FOR EVERY EPOCH
     batch_num = 0  # INITIALIZING VARIABLES
     cumulative_loss = 0  # INITIALIZING VARIABLES
