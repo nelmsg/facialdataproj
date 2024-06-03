@@ -23,7 +23,7 @@ with torch.no_grad():
         individual_correct = {p: 0 for p in person}
         for i in person:
             for x in emotion:
-                file = Image.open(f"./{i}-data{w}/{i}-{x}{w}.jpg")
+                file = Image.open(f"./lab-data/{i}-data{w}/{i}-{x}{w}.jpg")
                 file_pil = Image.fromarray(np.uint8(file)).convert('L').convert('RGB')
                 file_tensor = transform(file_pil).unsqueeze(0)
 
