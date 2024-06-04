@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 import torch.nn as nn
-from torchvision.transforms import Compose, Normalize, ToTensor, Resize, CenterCrop
+from torchvision.transforms import Compose, Normalize, ToTensor, Resize, CenterCrop, PILToTensor
 import cv2
 from PIL import Image
 
@@ -10,11 +10,7 @@ transform = Compose([Resize(256), CenterCrop(224), ToTensor(), Normalize(0.5077,
 cv2.namedWindow("preview")
 cap = cv2.VideoCapture(0)
 
-if cap.isOpened():
-    retention, frame = cap.read()
-else:
-    retention = False
-    frame = "Not supporting video "
+retention, frame = cap.read()
 
 with torch.no_grad():
     model = torch.hub.load('pytorch/vision:v0.10.0', 'resnet18', pretrained=True)  # LOADING RESNET
