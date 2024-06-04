@@ -8,9 +8,9 @@ from torchvision.transforms import Compose, Normalize, ToTensor, Resize, CenterC
 import sys
 import warnings
 
-warnings.filterwarnings("ignore", category=UserWarning)
+warnings.filterwarnings("ignore", category=UserWarning)  # DO NOT PRINT USER WARNINGS
 
-embedder = FaceNet()
+embedder = FaceNet()  # IMPORT FACENET EMBEDDER
 
 cv2.namedWindow("preview")
 cap = cv2.VideoCapture(0)
@@ -21,7 +21,8 @@ null_f = open('/dev/null', 'w')
 
 transform = Compose([Resize(256), CenterCrop(224), ToTensor(), Normalize(0.5077, 0.2550)])
 
-emotion = ["\033[1;31angry", "\033[1;32disgusted", "\033[1;35fearful", "\033[1;33happy", "\033[1;37neutral", "\033[1;34sad", "\033[1;36surprised"]
+emotion = ["\033[31mangry\033[0m", "\033[32mdisgusted\033[0m", "\033[35mfearful\033[0m", "\033[33mhappy\033[0m",
+           "\033[37mneutral\033[0m", "\033[34msad\033[0m", "\033[36msurprised\033[0m"]
 
 emotion_trump = None
 past_emotions = []
@@ -66,7 +67,7 @@ with torch.no_grad():
         cv2.imshow("preview", frame_annotated)  # DISPLAY EACH FRAME
 
         retention, frame = cap.read()  # SAVE FRAMES
-        key = cv2.waitKey(1)  # FRAME RATE
+        key = cv2.waitKey(100)  # FRAME RATE
         if key == 27:  # IF ESC KEY PRESSED
             break  # END RETENTION
 
