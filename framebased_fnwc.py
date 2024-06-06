@@ -21,11 +21,13 @@ null_f = open('/dev/null', 'w')
 
 transform = Compose([Resize(256), CenterCrop(224), ToTensor(), Normalize(0.5077, 0.2550)])
 
-emotion = ["\033[31mangry\033[0m", "\033[32mdisgusted\033[0m", "\033[35mfearful\033[0m", "\033[33mhappy\033[0m",
-           "\033[37mneutral\033[0m", "\033[34msad\033[0m", "\033[36msurprised\033[0m"]
-
-emotion_trump = None
+memory = 0
+# emotion = ["\033[31m angry\033[0m", "\033[32m disgusted\033[0m", "\033[35m fearful\033[0m", "\033[33m happy\033[0m",
+#            "\033[37m neutral\033[0m", "\033[34m sad\033[0m", "\033[36m surprised\033[0m"]
+emotion = ["angry", "disgusted", "fearful", "happy", "neutral", "sad", "surprised"]
+choice = ""
 past_emotions = []
+has_emotion = False
 
 with torch.no_grad():
     model = torch.hub.load('pytorch/vision:v0.10.0', 'resnet18', pretrained=True)  # LOADING RESNET
@@ -44,22 +46,61 @@ with torch.no_grad():
         sys.stdout = stdout_ref
 
         draw = ImageDraw.Draw(frame_pil)
+        print_state = []
+        print_state_sorted = []
+
+
+
+
+
+
         for d in detections:
             box = d['box']
             x, y, width, height = box
             draw.rectangle([(x, y), (x + width, y + height)], outline='red', width=10)
-            region = frame_pil.crop((x, y, x+width, y+height))
+            region = frame_pil.crop((x, y, x + width, y + height))
             region_tensor = transform(region).unsqueeze(0)
             z = model(region_tensor)
             emotion_index = torch.argmax(z, dim=1).item()
             choice = emotion[emotion_index]
-            past_emotions.append(choice)
-            if len(past_emotions) > 3:
-                past_emotions.pop(0)
-            if len(set(past_emotions)) == 1:
-                emotion_trump = past_emotions[0]
+            face_info = x, choice
+            print_state.append(face_info)
 
-        sys.stdout.write("\rCurrent Emotion: {}".format(emotion_trump))
+        print_state_sorted = sorted(print_state, key=lambda item: item[0])
+
+        std_state = []
+        trump_emotion = ""
+        face_num = 0
+        for x, choice in print_state_sorted:
+            face_num += 1
+            std_state.append(f"Face {face_num} Emotion: {choice}")
+
+        sys.stdout.write("\r" + "" * 100)
+        sys.stdout.write("\r" + "  |  ".join(std_state))
+
+        # past_emotions.append(std_state)
+        # if len(past_emotions) > 3:
+        #     past_emotions.pop(0)
+        #
+        #
+        # of_the_same = 0
+        # if has_emotion is False and memory < 3:
+        #     sys.stdout.write("\r" + "" * 100)
+        #     sys.stdout.write("\r" + "  |  ".join(std_state))
+        #     memory += 1
+        #     for x, choice in print_state_sorted:
+        #         if of_the_same == 0:
+        #             of_the_same += 1
+        #             same_choice = choice
+        #         elif choice == same_choice:
+        #             of_the_same += 1
+        # elif memory == 3 and has_emotion is True:
+        #     for x, choice in print_state_sorted:
+        #         if of_the_same == 3:
+        #             sys.stdout.write("\r" + "" * 100)
+        # elif has_emotion is True and memory < 3:
+        #     sys.stdout.write(f"\rTrump Emotion: {trump_emotion}")
+
         sys.stdout.flush()
 
         frame_annotated = np.array(frame_pil)
