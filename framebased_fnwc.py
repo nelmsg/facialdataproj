@@ -49,11 +49,6 @@ with torch.no_grad():
         print_state = []
         print_state_sorted = []
 
-
-
-
-
-
         for d in detections:
             box = d['box']
             x, y, width, height = box
@@ -77,29 +72,6 @@ with torch.no_grad():
 
         sys.stdout.write("\r" + "" * 100)
         sys.stdout.write("\r" + "  |  ".join(std_state))
-
-        # past_emotions.append(std_state)
-        # if len(past_emotions) > 3:
-        #     past_emotions.pop(0)
-        #
-        #
-        # of_the_same = 0
-        # if has_emotion is False and memory < 3:
-        #     sys.stdout.write("\r" + "" * 100)
-        #     sys.stdout.write("\r" + "  |  ".join(std_state))
-        #     memory += 1
-        #     for x, choice in print_state_sorted:
-        #         if of_the_same == 0:
-        #             of_the_same += 1
-        #             same_choice = choice
-        #         elif choice == same_choice:
-        #             of_the_same += 1
-        # elif memory == 3 and has_emotion is True:
-        #     for x, choice in print_state_sorted:
-        #         if of_the_same == 3:
-        #             sys.stdout.write("\r" + "" * 100)
-        # elif has_emotion is True and memory < 3:
-        #     sys.stdout.write(f"\rTrump Emotion: {trump_emotion}")
 
         sys.stdout.flush()
 
