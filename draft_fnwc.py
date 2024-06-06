@@ -49,8 +49,6 @@ def find_distance(face_data, faces_per_frame):
     for item in face_data:
         for detection in faces_per_frame:
             detection.distance.append(abs(item.location - detection.location))
-    # print(f"per frame: {faces_per_frame}")
-    # print(f"total: {face_data}")
     counter = 0
     for piece in face_data:
         counter += 1
@@ -71,7 +69,6 @@ def match_faces(face_data, faces_per_frame):
             if d[0] not in associations:
                 is_associated = True
                 associations[d[0]] = f
-                # face_data[d[0]].emotion.append(f.emotion)
                 face_data[d[0]].emotions_past.append(f.emotion)
                 face_data[d[0]].location = f.location
                 break
