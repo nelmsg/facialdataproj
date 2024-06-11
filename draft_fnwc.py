@@ -53,7 +53,9 @@ def find_distance(face_data, faces_per_frame):
     for piece in face_data:
         counter += 1
         if len(set(piece.emotions_past)) == 1 and len(piece.emotions_past) == 3:
-            print(f"trump {counter}: {set(piece.emotions_past)}")
+            print(f"Face {counter}: {set(piece.emotions_past)}")
+
+
 
 
 def match_faces(face_data, faces_per_frame):
