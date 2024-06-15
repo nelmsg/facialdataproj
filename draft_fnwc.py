@@ -25,7 +25,7 @@ class FaceData:
 
 def get_detections(embedder, frame, frame_pil):
     sys.stdout = null_f
-    detections = embedder.extract(frame, threshold=0.95)
+    detections = embedder.extract(frame, threshold=0.8)
     sys.stdout = stdout_ref
     faces_per_frame = []
 
@@ -56,8 +56,6 @@ def find_distance(face_data, faces_per_frame):
             print(f"Face {counter}: {set(piece.emotions_past)}")
 
 
-
-
 def match_faces(face_data, faces_per_frame):
     if len(face_data) == 0:
         faces_per_frame_sorted = faces_per_frame
@@ -74,7 +72,7 @@ def match_faces(face_data, faces_per_frame):
                 face_data[d[0]].emotions_past.append(f.emotion)
                 face_data[d[0]].location = f.location
                 break
-        if is_associated == False:
+        if not is_associated:
             face_data.append(FaceData(f.location, [f.emotion]))
             associations[len(face_data) - 1] = f
     remove_indices = []
@@ -84,6 +82,7 @@ def match_faces(face_data, faces_per_frame):
     remove_indices_sorted = sorted(remove_indices, key=lambda item: item, reverse=True)
     for i in remove_indices_sorted:
         face_data.pop(i)
+
 
 warnings.filterwarnings("ignore", category=UserWarning)  # DO NOT PRINT USER WARNINGS
 stdout_ref = sys.__stdout__
@@ -97,8 +96,6 @@ retention, frame = cap.read()
 
 transform = Compose([Resize(256), CenterCrop(224), ToTensor(), Normalize(0.5077, 0.2550)])
 
-# emotion = ["\033[31m angry\033[0m", "\033[32m disgusted\033[0m", "\033[35m fearful\033[0m", "\033[33m happy\033[0m",
-#            "\033[37m neutral\033[0m", "\033[34m sad\033[0m", "\033[36m surprised\033[0m"]
 emotion_list = ["angry", "disgusted", "fearful", "happy", "neutral", "sad", "surprised"]
 
 face_data = []
