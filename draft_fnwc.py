@@ -8,6 +8,7 @@ from torchvision.transforms import Compose, Normalize, ToTensor, Resize, CenterC
 import sys
 import warnings
 from dataclasses import dataclass
+import os
 
 
 @dataclass
@@ -38,18 +39,18 @@ def get_detections(embedder, frame, frame_pil):
         region = frame_pil.crop((x, y, x+width, y+height))
         region_tensor = transform(region).unsqueeze(0)
         z = model(region_tensor)
-        print(f"z: {z}")
+        # print(f"z: {z}")
 
         emotion_num = torch.argmax(z, dim=1).item()
-        print(emotion_num)
+        # print(emotion_num)
         emotion = emotion_list[emotion_num]
         faces_per_frame.append(Face(location, emotion, []))
-        print(f"faces_per_frame: {faces_per_frame}")
+        # print(f"faces_per_frame: {faces_per_frame}")
     return faces_per_frame
 
 
 def find_distance(face_data, faces_per_frame):
-    print(f"face data: {face_data}")
+    # print(f"face data: {face_data}")
     for item in face_data:
         for detection in faces_per_frame:
             detection.distance.append(abs(item.location - detection.location))
@@ -57,6 +58,7 @@ def find_distance(face_data, faces_per_frame):
     for piece in face_data:
         counter += 1
         if len(set(piece.emotions_past)) == 1 and len(piece.emotions_past) == 3:
+            os.system('cls' if os.name == 'nt' else 'clear')
             print(f"Face {counter}: {set(piece.emotions_past)}")
 
 
@@ -88,6 +90,8 @@ def match_faces(face_data, faces_per_frame):
         face_data.pop(i)
 
 
+os.environ['TERM'] = 'xterm'
+
 warnings.filterwarnings("ignore", category=UserWarning)  # DO NOT PRINT USER WARNINGS
 stdout_ref = sys.__stdout__
 null_f = open('/dev/null', 'w')
@@ -110,7 +114,7 @@ with torch.no_grad():
     model = torch.hub.load('pytorch/vision:v0.10.0', 'resnet18', pretrained=True)  # LOADING RESNET
     model.fc = nn.Linear(model.fc.in_features, 7)  # DEFINING CLASS NUMBER
 
-    state_dict = torch.load('resnet18_model_file_mixup_on2.pth', map_location='cpu')  # LOADING WEIGHTS
+    state_dict = torch.load('resnet18_model_file_mixup_on_orig.pth', map_location='cpu')  # LOADING WEIGHTS
     model.load_state_dict(state_dict)  # LOADING THE MODEL WITH SET WEIGHTS
     model.eval()  # REMOVE DROPOUT
 
@@ -126,7 +130,7 @@ with torch.no_grad():
         match_faces(face_data, faces_per_frame)
 
         for i in face_data:
-            print(f"emotions past: {i.emotions_past}")
+            # print(f"emotions past: {i.emotions_past}")
             if len(i.emotions_past) > 3:
                 i.emotions_past.pop(0)
 
