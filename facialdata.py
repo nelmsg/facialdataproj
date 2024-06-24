@@ -64,8 +64,8 @@ else:
 
 emotions_train = ImageFolder(root="./archive/train", transform=transforms_train)  # TRANSFORMS EVERY SAMPLE IN DATASET
 emotions_test = ImageFolder(root="./archive/test", transform=transforms_test)  # TRANSFORMS EVERY SAMPLE IN DATASET
-dataloader_train = DataLoader(emotions_train, batch_size=256, shuffle=True, drop_last=True, num_workers=0, pin_memory=True)  # SHUFFLE LOADER TO TRAIN
-dataloader_test = DataLoader(emotions_test, batch_size=256, shuffle=False, num_workers=0, pin_memory=True)  # MAKES A DATALOADER FOR TESTING
+dataloader_train = DataLoader(emotions_train, batch_size=256, shuffle=True, drop_last=True, num_workers=4, pin_memory=True)  # SHUFFLE LOADER TO TRAIN
+dataloader_test = DataLoader(emotions_test, batch_size=256, shuffle=False, num_workers=4, pin_memory=True)  # MAKES A DATALOADER FOR TESTING
 
 optimizer = optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)  # ESTABLISHES SGD OPTIMIZER
 scheduler = StepLR(optimizer, step_size=30, gamma=0.1)  # ESTABLISHES LEARNING RATE DECAY
