@@ -155,16 +155,16 @@ torch.save(model.state_dict(), f"{args.arch}_model_file_mixup_{args.mixup}.pth")
 
 with open("train_loss.txt", "w+") as t:
     for i in train_loss:
-        t.write(str(i) + "\n")
+        t.write(str(i.item()) + "\n")
 
 with open("test_loss.txt", "w+") as t:
     for i in test_loss:
-        t.write(str(i) + "\n")
+        t.write(str(i.item()) + "\n")
 
 with open("train_acc.txt", "w+") as t:
     for i in train_acc:
-        t.write(str(i) + "\n")
+        t.write(str(i.item()) + "\n")
 
-with open("test_loss.txt", "w+") as t:
+with open("test_acc.txt", "w+") as t:
     for i in test_acc:
-        t.write(str(i) + "\n")
+        t.write(str(i.item()) + "\n")
