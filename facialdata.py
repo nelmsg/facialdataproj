@@ -9,6 +9,7 @@ from pranc_models import resnet20, resnet56
 import argparse
 from torch.optim.lr_scheduler import StepLR
 from timm.data import Mixup
+import matplotlib as plt
 
 parser = argparse.ArgumentParser()  # DEFINING ARGUMENT FUNCTION
 parser.add_argument('--arch', type=str,
@@ -63,10 +64,10 @@ else:
 
 emotions_train = ImageFolder(root="./archive/train", transform=transforms_train)  # TRANSFORMS EVERY SAMPLE IN DATASET
 emotions_test = ImageFolder(root="./archive/test", transform=transforms_test)  # TRANSFORMS EVERY SAMPLE IN DATASET
-dataloader_train = DataLoader(emotions_train, batch_size=256, shuffle=True, drop_last=True, num_workers=4, pin_memory=True)  # SHUFFLE LOADER TO TRAIN
-dataloader_test = DataLoader(emotions_test, batch_size=256, shuffle=False, num_workers=4, pin_memory=True)  # MAKES A DATALOADER FOR TESTING
+dataloader_train = DataLoader(emotions_train, batch_size=256, shuffle=True, drop_last=True, num_workers=0, pin_memory=True)  # SHUFFLE LOADER TO TRAIN
+dataloader_test = DataLoader(emotions_test, batch_size=256, shuffle=False, num_workers=0, pin_memory=True)  # MAKES A DATALOADER FOR TESTING
 
-optimizer = optim.SGD(model.parameters(), lr=1e-1, weight_decay=1e-4, momentum=0.9)  # ESTABLISHES SGD OPTIMIZER
+optimizer = optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)  # ESTABLISHES SGD OPTIMIZER
 scheduler = StepLR(optimizer, step_size=30, gamma=0.1)  # ESTABLISHES LEARNING RATE DECAY
 loss_f = nn.CrossEntropyLoss()  # ESTABLISHES A LOSS FUNCTION BASED ON CEL
 
@@ -79,6 +80,9 @@ test_acc = []  # INITIALIZING VARIABLES
 test_loss = []  # INITIALIZING VARIABLES
 previous_accuracy = 0  # INITIALIZING VARIABLES
 previous_loss = 0  # INITIALIZING VARIABLES
+
+train_acc = []
+train_loss = []
 
 for epoch in range(n_epochs):  # RUNS FOR EVERY EPOCH
     batch_num = 0  # INITIALIZING VARIABLES
@@ -110,6 +114,8 @@ for epoch in range(n_epochs):  # RUNS FOR EVERY EPOCH
         print(f"    Epoch: {epoch}  Batch: {batch_num}  Accuracy: {acc}"
               f" BS: {len(y)}  Model: {args.arch}")  # BATCH-WISE REPORT
     cumulative_train_accuracy = correct_data_train / total_data_train
+    train_acc.append(cumulative_train_accuracy)
+    train_loss.append(cumulative_loss / batch_num)
     print(f"Cumulative Loss: {cumulative_loss}   "
           f"Cumulative Training Accuracy: {cumulative_train_accuracy}")  # EPOCH-WISE TRAINING REPORT
 
@@ -127,6 +133,8 @@ for epoch in range(n_epochs):  # RUNS FOR EVERY EPOCH
             cumulative_test_loss += loss_t.detach().cpu()  # BUILDS TOTAL LOSS
             correct_datapoints += torch.sum((y_prediction_test.argmax(dim=1) == y))
         acc_t = correct_datapoints / datapoints  # CALCULATES AVERAGE ACCURACY
+        test_acc.append(acc_t)
+        test_loss.append(cumulative_test_loss / len(dataloader_test))
 
     if acc_t < previous_accuracy:
         accuracy_annotation = "\033[1;31;40m [Negative Change.]"
@@ -144,3 +152,19 @@ for epoch in range(n_epochs):  # RUNS FOR EVERY EPOCH
     scheduler.step()
 
 torch.save(model.state_dict(), f"{args.arch}_model_file_mixup_{args.mixup}.pth")
+
+with open("train_loss.txt", "w+") as t:
+    for i in train_loss:
+        t.write(str(i) + "\n")
+
+with open("test_loss.txt", "w+") as t:
+    for i in test_loss:
+        t.write(str(i) + "\n")
+
+with open("train_acc.txt", "w+") as t:
+    for i in train_acc:
+        t.write(str(i) + "\n")
+
+with open("test_loss.txt", "w+") as t:
+    for i in test_acc:
+        t.write(str(i) + "\n")
