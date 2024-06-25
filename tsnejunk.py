@@ -2,8 +2,7 @@ import torch
 import torch.nn as nn
 from torchvision.datasets import ImageFolder
 from torch.utils.data import DataLoader
-from torchvision.transforms import (Normalize, Compose, ToTensor, RandomCrop, RandomHorizontalFlip,
-                                    ColorJitter, Resize, CenterCrop, RandomRotation)
+from torchvision.transforms import Normalize, Compose, ToTensor, Resize, CenterCrop
 import matplotlib.pyplot as plt
 from sklearn.manifold import TSNE
 import numpy as np
@@ -19,7 +18,7 @@ model = model.to(device)  # SENDS THE MODEL TO CPU OR GPU
 
 transform = Compose([Resize(256), CenterCrop(224), ToTensor(), Normalize(0.5077, 0.2550)])
 
-emotions_test = ImageFolder(root="./archive/train", transform=transform)  # TRANSFORMS EVERY SAMPLE IN DATASET
+emotions_test = ImageFolder(root="./archive/test", transform=transform)  # TRANSFORMS EVERY SAMPLE IN DATASET
 dataloader_test = DataLoader(emotions_test, batch_size=256, shuffle=False, num_workers=0, pin_memory=True)
 
 
